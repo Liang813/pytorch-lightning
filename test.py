@@ -36,7 +36,7 @@ class MNISTModel(pl.LightningModule):
 train_loader = DataLoader(MNIST(os.getcwd(), train=True, download=True, transform=transforms.ToTensor()), batch_size=32)
 
 mnist_model = MNISTModel()
-trainer = pl.Trainer(gpus=1,max_epochs=3)    
+trainer = pl.Trainer(max_epochs=3)    
 trainer.fit(mnist_model, train_loader)  
 
 test_loader = DataLoader(MNIST(os.getcwd(), train=False, download=True, transform=transforms.ToTensor()), batch_size=32)
