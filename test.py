@@ -6,38 +6,41 @@ from torch.utils.data import DataLoader
 from torchvision.datasets import MNIST
 from torchvision import transforms
 import pytorch_lightning as pl
+try:
+    class MNISTModel(pl.LightningModule):
 
-class MNISTModel(pl.LightningModule):
+        def __init__(self):
+            super(MNISTModel, self).__init__()
+            self.l1 = torch.nn.Linear(28 * 28, 10)
 
-    def __init__(self):
-        super(MNISTModel, self).__init__()
-        self.l1 = torch.nn.Linear(28 * 28, 10)
+        def forward(self, x):
+            return torch.relu(self.l1(x.view(x.size(0), -1)))
 
-    def forward(self, x):
-        return torch.relu(self.l1(x.view(x.size(0), -1)))
+        def training_step(self, batch, batch_nb):
+            x, y = batch
+            loss = F.cross_entropy(self(x), y)
+            tensorboard_logs = {'train_loss': loss}
+            return {'loss': loss, 'log': tensorboard_logs}
 
-    def training_step(self, batch, batch_nb):
-        x, y = batch
-        loss = F.cross_entropy(self(x), y)
-        tensorboard_logs = {'train_loss': loss}
-        return {'loss': loss, 'log': tensorboard_logs}
+        def test_step(self, batch, batch_nb):
+            x, y = batch
+            y_hat = self(x)
+            loss = F.cross_entropy(y_hat, y)
+            tensorboard_logs = {'train_loss': loss}
+            return {'loss': loss, 'log': tensorboard_logs}
 
-    def test_step(self, batch, batch_nb):
-        x, y = batch
-        y_hat = self(x)
-        loss = F.cross_entropy(y_hat, y)
-        tensorboard_logs = {'train_loss': loss}
-        return {'loss': loss, 'log': tensorboard_logs}
-
-    def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=0.02)
+        def configure_optimizers(self):
+            return torch.optim.Adam(self.parameters(), lr=0.02)
 
 
-train_loader = DataLoader(MNIST(os.getcwd(), train=True, download=True, transform=transforms.ToTensor()), batch_size=32)
+    train_loader = DataLoader(MNIST(os.getcwd(), train=True, download=True, transform=transforms.ToTensor()), batch_size=32)
 
-mnist_model = MNISTModel()
-trainer = pl.Trainer(max_epochs=3)    
-trainer.fit(mnist_model, train_loader)  
+    mnist_model = MNISTModel()
+    trainer = pl.Trainer(max_epochs=3)    
+    trainer.fit(mnist_model, train_loader)  
 
-test_loader = DataLoader(MNIST(os.getcwd(), train=False, download=True, transform=transforms.ToTensor()), batch_size=32)
-trainer.test(test_dataloaders=test_loader)
+    test_loader = DataLoader(MNIST(os.getcwd(), train=False, download=True, transform=transforms.ToTensor()), batch_size=32)
+    trainer.test(test_dataloaders=test_loader)
+except Exception as e:
+    print("TypeError")
+    print(e)
