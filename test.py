@@ -41,3 +41,4 @@ trainer.fit(mnist_model, train_loader)
 
 test_loader = DataLoader(MNIST(os.getcwd(), train=False, download=True, transform=transforms.ToTensor()), batch_size=32)
 trainer.test(test_dataloaders=test_loader)
+print("success")
