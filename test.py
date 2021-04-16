@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 from torchvision.datasets import MNIST
 from torchvision import transforms
 import pytorch_lightning as pl
+import traceback
 try:
     class MNISTModel(pl.LightningModule):
 
@@ -42,5 +43,4 @@ try:
     test_loader = DataLoader(MNIST(os.getcwd(), train=False, download=True, transform=transforms.ToTensor()), batch_size=32)
     trainer.test(test_dataloaders=test_loader)
 except Exception as e:
-    print("TypeError")
-    print(e)
+    traceback.print_exc(file=open('/script/pytorch-lightning2386-buggy.txt','w+'))
