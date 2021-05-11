@@ -4,7 +4,7 @@ from torch.nn import functional as F
 from torch.utils.data import DataLoader
 from torchvision.datasets import MNIST
 import torchvision.transforms as transforms
-
+import traceback
 import pytorch_lightning as pl
 
 class CoolModel(pl.LightningModule):
@@ -33,8 +33,10 @@ class CoolModel(pl.LightningModule):
         return DataLoader(subset, batch_size=32)
 
 from pytorch_lightning import Trainer
+try:
+    model = CoolModel()
 
-model = CoolModel()
-
-trainer = Trainer()
-trainer.fit(model)
+    trainer = Trainer()
+    trainer.fit(model)
+except Exception as e:
+    traceback.print_exc(file=open('/script/pytorch-lightning139-buggy.txt','w+'))
